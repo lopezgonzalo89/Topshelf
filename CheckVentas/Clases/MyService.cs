@@ -25,8 +25,8 @@ namespace CheckVentas.Clases
                 MySqlDataReader reader0 = cmd0.ExecuteReader();
 
                 while (reader0.Read()) { 
-                    String UltVentaString = reader0.GetString("UltVenta");
-                    ultVentaInt = int.Parse(UltVentaString);
+                    String ultVentaString = reader0.GetString("UltVenta");
+                    ultVentaInt = int.Parse(ultVentaString);
                 }
                 // Cierro con 0
                 conexion0.Close();
@@ -44,7 +44,7 @@ namespace CheckVentas.Clases
                     String IdVentaString = reader1.GetString("IdVenta");
 
                     int IdVentaInt = int.Parse(IdVentaString);
-                    if (ultVentaInt <= IdVentaInt)
+                    if (ultVentaInt < IdVentaInt)
                     {
                         // Abro Con 3
                         MySqlConnection conexion3 = new MySqlConnection("Server=localhost;Database=choppin_db;Uid=root;Pwd=;");
@@ -57,10 +57,11 @@ namespace CheckVentas.Clases
 
                         Console.WriteLine("UltVentaInt: " + ultVentaInt);
                         Console.WriteLine("IdVentaInt: " + IdVentaInt);
+
                         //obtener IdProductoVenta y cantidad del IdVenta
                         String IdProductoVenta = reader1.GetString("IdProductoVenta");
                         String CantidadVenta = reader1.GetString("Cantidad");
-                        int CantVenta = int.Parse(CantidadVenta);
+                        float CantVenta = float.Parse(CantidadVenta);
 
                         // Vuelvo a abrir con 0
                         conexion0.Open();
@@ -71,13 +72,13 @@ namespace CheckVentas.Clases
                         while (read.Read())
                         {
                             String Cantidad = read.GetString("Cantidad");
-                            int Cant = int.Parse(Cantidad);
+                            float Cant = float.Parse(Cantidad);
                             DateTime hoy = DateTime.Now;
 
                             // Defino Fecha, IdProducto, CantTotal, IdTipoMov, Nota
                             string fecha = hoy.ToString("yyyy/MM/dd");
                             String IdProducto = read.GetString("IdProducto");
-                            int CantTotal = Cant * CantVenta;
+                            float CantTotal = Cant * CantVenta;
                             String idTipoMov = "3";
                             String nota = "Insertado desde C#";
 
@@ -89,18 +90,16 @@ namespace CheckVentas.Clases
                             MySqlConnection conexion2 = new MySqlConnection("Server=localhost;Database=choppin_db;Uid=root;Pwd=;");
                             conexion2.Open();
 
-                            MySqlCommand cmd3 = new MySqlCommand("INSERT INTO `movimientos` (`IdMovimiento`, `IdProducto`, `Fecha`, `Cantidad`, `Nota`, `IdTipoMovimiento`) VALUES (NULL, '" + IdProducto + "', '" + fecha + "', '-" + CantTotal + "', '" + nota + "', '" + idTipoMov + "')", conexion2);
+                            MySqlCommand cmd3 = new MySqlCommand("INSERT INTO `movimientos` (`IdMovimiento`, `IdProducto`, `Fecha`, `Cantidad`, `Nota`, `IdTipoMovimiento`) VALUES(NULL, '" + IdProducto + "', '" + fecha + "', '-" + CantTotal + "', '" + nota + "', '" + idTipoMov + "')", conexion2);
+                                                                  
                             MySqlDataReader dr = cmd3.ExecuteReader();
                             conexion2.Close();
-
                         }
                         conexion0.Close();
                     }
                 }
                 conexion1.Close();
-            }
-                // Volver a Comparar en 15'
-            
+            }            
             catch (MySqlException e)
             {
                 Console.WriteLine("MySqlException: " + e);
@@ -108,7 +107,7 @@ namespace CheckVentas.Clases
         }
         public void Stop()
         {
-
+            Console.WriteLine("Stop program.");
         }
     }
 }
